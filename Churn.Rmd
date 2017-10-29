@@ -1,0 +1,83 @@
+---
+title: "Churn Analysis"
+author: "Siva"
+date: "October 29, 2017"
+output: pdf_document
+---
+
+```{r setup,}
+#Importing the data
+
+a=read.csv("/home/siva/Downloads/Tcustomer.csv")
+head(a)
+print(str(a))
+
+#cgecking the n/a values
+
+any(is.na(a))
+
+#Creating a new tenure interval coloumn
+
+group_tenure=function(tenure){
+  if (tenure >=0 && tenure <=6 )
+  {
+    return('0-6 Month')
+  }
+  else if (tenure > 6 && tenure <= 12)
+  {
+    return('6-12 Month')
+  }
+  else if (tenure > 12 && tenure <= 24)
+  {
+    return('12-24 Month')
+  }
+  else if (tenure > 24 && tenure <= 36)
+  {
+    return('24-36 Month')
+  }
+  else if (tenure > 36 && tenure <= 48)
+  {
+    return('36-48 Month')
+  }
+  else if (tenure > 48 && tenure <= 62)
+  {
+    return('48-62 Month')
+  }
+  else if (tenure > 62)
+  {
+    return('> 62 Month')
+  }
+}
+
+#removing the unwanted coloumn
+
+a <- a[-1]
+attach(a)
+
+#applying a group tenure function on each row
+
+a$tenure_interval=sapply(a$tenure,group_tenure)
+a$tenure_interval=as.factor(a$tenure_interval)
+head(a,n=2)
+
+#Partioning the data
+set.seed(123)
+library(caTools)
+sampling=sample.split(a$Churn,SplitRatio = 0.7)
+
+#Testing and training data 
+
+trainData <- subset(a,sampling == "TRUE")
+testData <- subset(a,sampling == "FALSE")
+nrow(trainData)
+nrow(testData)
+
+#Regression technique
+
+a=glm(Churn~.,trainData,family = "binomial")
+summary(a)
+```
+##conclusion
+
+From the model summary, the response churn variable is affected by tenure interval, contract period, paper billing, senior citizen, and multiple line variables. The importance of the variable will be identified by the legend of the correlated coefficients (*** – high importance, * – medium importance, and dot – next level of importance). Rerunning the model with these dependent variables will impact the model performance and accuracy. 
+With the choice of logistic regression, it is evident that the accuracy for this model is evaluated as 80% and error rate as 20%. The accuracy of the model can be improved with other classification models such as decision tree, and random forest with parameter tuning
