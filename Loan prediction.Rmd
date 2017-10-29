@@ -1,0 +1,75 @@
+---
+title: "Loan prediction"
+author: "Siva"
+date: "September 14, 2017"
+output: pdf_document
+---
+
+```{r setup}
+#Importing Loan Prediction Data
+data2=read.csv("/home/siva/Downloads/train1.csv")
+#Recoding all categorical variables into 0/1 
+data2$Gender=ifelse(data2$Gender=="Male",1,0)
+data2$Married=ifelse(data2$Married=="Yes",1,0)
+data2$Dependents_1 = ifelse(data2$Dependents == "1",1,0)
+data2$Dependents_2 = ifelse(data2$Dependents == "2",1,0)
+data2$Dependents_3 = ifelse(data2$Dependents == "3+",1,0)
+data2$Education=ifelse(data2$Education=="Graduate",1,0)
+data2$Property_Area_1=ifelse(data2$Property_Area=="Urban",1,0)
+data2$Property_Area_2=ifelse(data2$Property_Area=="Rural",1,0)
+data2$Property_Area_3=ifelse(data2$Property_Area=="Semiurban",1,0)
+data2$Self_Employed=ifelse(data2$Self_Employed=="Yes",1,0)
+head(data2)
+attach(data2)
+#fitting a linear model with all variables
+model=lm(LoanAmount~Gender+Dependents_1 + Dependents_2+Dependents_3+Self_Employed+Married+ApplicantIncome+CoapplicantIncome+Loan_Amount_Term+Credit_History+Property_Area_1+Property_Area_2+Property_Area_3+Loan_Status,data = data2)
+
+plot(model)
+```
+
+```{r cars}
+#Summary of the model 
+summary(model)
+#Summary of forward selection
+model_fs_forward=step(model,direction = "forward")
+#summary of forward 
+summary(model_fs_forward)
+
+plot(model_fs_forward)
+```
+
+## forward modelling conclusion 
+
+From this model also the variables Married, Education, ApplicantIncome & Loan_Amount_Term are the significant variables. The total variation explained by the independent
+variables on the dependent variable is 37.3% ,i.e., my multiple R-squared value of the model. Since the
+p-value is lesser than level of confidence(0.05) it shows the overall model is significant.
+
+```{r pressure}
+#performing backward elimination
+model_fs_backward=step(model,direction="backward")
+#summary of backward elimination 
+summary(model_fs_backward)
+plot(model_fs_backward)
+```
+
+## Backward modelling conclusion 
+In this model after eliminating all insignificant variables, the variables Married,Education,ApplicantIncome & Loan_Amount_Term came out to be the most significant variables.The total variation explained by the independent variables on the dependent variable is 80.32%,i.e., my multiple R-squared value of the model.Since the p-value is lesser than level of confidence(0.05) it shows the overall model is significant.
+
+
+```{r test}
+
+#Performing Stepwise Regression
+model_fs_step=step(model,direction="both")
+#summary of step model
+summary(model_fs_step)
+plot(model_fs_step)
+
+```
+
+## Stepwise model conclusion 
+In Stepwise Regression model the variables entered in the previous step is been reassessed in each step.After  reassessing all the entered variables,the variables Married, Education, ApplicantIncome & Loan_Amount_Term came out to be the    most significant variables.The total variationexplained by the independent variables on the dependent variable is 80.32%,i.e.,my   multiple R-squared valueof the model.Since the p-value is lesser than level of confidence(0.05) it shows the overall model is significant.
+
+## Result
+
+In this scenario Linear Model has given the most accurate model because the R-Squared Value is the highest amongst all the other models and also the Standard Error is minimum for the Linear Model. Linear Regression Model is most accurate just because we have taken a random independent variable as our dependent variable .
+
