@@ -1,0 +1,56 @@
+---
+title: "Diabetes"
+author: "Siva"
+date: "October 29, 2017"
+output: pdf_document
+---
+
+```{r setup}
+
+title: "Diabetes_case study(Logistics Regression)"
+author: "Siva"
+date: "September 29, 2017"
+output: pdf_document
+---
+
+```{r setup}
+#Importing diabetes Prediction Data
+db=read.csv("/home/siva/Downloads/diabetes.csv")
+head(db)
+library(caret)
+
+#creating a partition
+ind=createDataPartition(db$Outcome,p=1/4,list=FALSE)
+df=db[-ind,]
+ds=db[ind,]
+attach(db)
+
+#Performing the Logistics Regression and summary
+v=glm(Outcome~.,data = df,family="binomial")
+summary(v)
+
+#Elimating the skin thickness coloumn to have the better accuracy model
+v=glm(Outcome~.-SkinThickness-Insulin,data = df,family="binomial")
+summary(v)
+
+#Performing the probality and confusion matrix
+pr=predict(v,ds,type="response")
+pr
+con_db=table(actualvalue=ds$Outcome,predictivevalue=pr>0.5)
+con_db
+
+
+#Predicting with the outcome and ploting the graph
+library(ROCR)
+ROCRpred=prediction(pr,ds$Outcome)
+ROCRpref=performance(ROCRpred,"tpr","fpr")
+plot(ROCRpref,colorize=TRUE,print.cutoffs.at=seq(0.1,by=0.1))
+
+
+```
+
+## Conulsion
+Overall, it seems that there is some form of an association between BMI, number of pregnancies, diabetespedigree function, and the test results for diabetes. To me, it was surprising that the median BMI did not immensely change as the number of pregnancies increased. I expected there to be a strong positive relationship between the number of pregnancies and the BMI. I was not surprised that overall, those who tested positive for diabetes had higher BMIs than those who did not; yet, I predicted a larger difference between the medians.
+
+In addition, the data that I received contained skin thickness in columns that does not biologically make sense. In order to get results as accurate and useful as possible, I removed the same .
+```
